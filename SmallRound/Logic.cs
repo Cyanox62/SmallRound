@@ -27,6 +27,13 @@ namespace SmallRound
 			else instance.Server.Round.Stats.ScientistsEscaped++;
 		}
 
+		private IEnumerator<float> SpawnDelay(Player player, Vector pos, float delay)
+		{
+			yield return Timing.WaitForSeconds(delay);
+
+			player.Teleport(pos);
+		}
+
 		private IEnumerator<float> GrantItemsDelay(Player player, List<ItemType> items, float delay)
 		{
 			yield return Timing.WaitForSeconds(delay);

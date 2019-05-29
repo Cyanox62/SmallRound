@@ -5,12 +5,14 @@ using System.Linq;
 using UnityEngine;
 using MEC;
 using System;
+using Smod2.EventSystem.Events;
 
 namespace SmallRound
 {
 	partial class EventHandler : 
 		IEventHandlerRoundStart, IEventHandlerWaitingForPlayers, IEventHandlerSpawn,
-		IEventHandlerLCZDecontaminate, IEventHandlerCheckRoundEnd, IEventHandlerElevatorUse
+		IEventHandlerLCZDecontaminate, IEventHandlerCheckRoundEnd, IEventHandlerElevatorUse,
+		IEventHandlerTeamRespawn
 	{
 		private readonly Plugin instance;
 
@@ -109,6 +111,30 @@ namespace SmallRound
 				else if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTIST)
 				{
 					CheckEscape(ev.Player, Smod2.API.Team.SCIENTIST);
+				}
+			}
+		}
+
+		public void OnTeamRespawn(TeamRespawnEvent ev)
+		{
+			if (isEnabled)
+			{
+				Vector pos = null;
+				if (ev.SpawnChaos)
+				{
+					pos = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftA).GetPositions()[0];
+				}
+				else
+				{
+					pos = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftB).GetPositions()[0];
+				}
+
+				if (pos != null)
+				{
+					foreach (Player player in ev.PlayerList)
+					{
+						Timing.RunCoroutine(SpawnDelay(player, pos, 0.2f));
+					}
 				}
 			}
 		}
