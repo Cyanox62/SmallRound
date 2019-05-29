@@ -83,9 +83,16 @@ namespace SmallRound
 
 		public void OnSpawn(PlayerSpawnEvent ev)
 		{
-			if (isEnabled && ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
+			if (isEnabled)
 			{
-				ev.SpawnPos = instance.Server.Map.GetRandomSpawnPoint(Role.SCP_173);
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
+				{
+					ev.SpawnPos = instance.Server.Map.GetRandomSpawnPoint(Role.SCP_173);
+				}
+				else if (ev.Player.TeamRole.Role == Role.FACILITY_GUARD)
+				{
+					ev.SpawnPos = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftB).GetPositions()[0];
+				}
 			}
 		}
 
