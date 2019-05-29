@@ -23,6 +23,8 @@ namespace SmallRound
 			int min = instance.Server.Round.Duration / 60;
 			int sec = instance.Server.Round.Duration % 60;
 			player.PersonalBroadcast(10, $"You have escaped as a {(isDClass ? "<color=#ff8e00>Class-D</color>" : "<color=#f6f677>Scientist</color>")} in {min} minutes and {sec} seconds.", false);
+			if (isDClass) instance.Server.Round.Stats.ClassDEscaped++;
+			else instance.Server.Round.Stats.ScientistsEscaped++;
 		}
 
 		private IEnumerator<float> GrantItemsDelay(Player player, List<ItemType> items, float delay)
