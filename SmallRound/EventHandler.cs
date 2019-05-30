@@ -85,7 +85,8 @@ namespace SmallRound
 		{
 			if (isEnabled)
 			{
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP)
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP ||
+					ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
 				{
 					ev.SpawnPos = instance.Server.Map.GetRandomSpawnPoint(Role.SCP_173);
 				}
