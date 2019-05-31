@@ -37,15 +37,15 @@ namespace SmallRound
 			isDecon = false;
 			isEnabled = ev.Server.GetPlayers().Count < turnOffPlayers;
 
-			foreach (Smod2.API.Item item in ev.Server.Map.GetItems(ItemType.ZONE_MANAGER_KEYCARD, true))
-			{
-				Vector pos = item.GetPosition();
-				item.Remove();
-				ev.Server.Map.SpawnItem(ItemType.SCIENTIST_KEYCARD, pos, Vector.Zero);
-			}
-
 			if (isEnabled)
 			{
+				foreach (Smod2.API.Item item in ev.Server.Map.GetItems(ItemType.ZONE_MANAGER_KEYCARD, true))
+				{
+					Vector pos = item.GetPosition();
+					item.Remove();
+					ev.Server.Map.SpawnItem(ItemType.SCIENTIST_KEYCARD, pos, Vector.Zero);
+				}
+
 				foreach (Player player in ev.Server.GetPlayers())
 				{
 					player.PersonalBroadcast
