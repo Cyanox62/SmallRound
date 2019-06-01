@@ -11,8 +11,7 @@ namespace SmallRound
 {
 	partial class EventHandler : 
 		IEventHandlerRoundStart, IEventHandlerWaitingForPlayers, IEventHandlerSpawn,
-		IEventHandlerLCZDecontaminate, IEventHandlerCheckRoundEnd, IEventHandlerElevatorUse,
-		IEventHandlerTeamRespawn
+		IEventHandlerLCZDecontaminate, IEventHandlerCheckRoundEnd, IEventHandlerElevatorUse
 	{
 		private readonly Plugin instance;
 
@@ -21,9 +20,11 @@ namespace SmallRound
 
 		private Vector mtfSpawnPoint;
 		private Vector chaosSpawnPoint;
+		private Vector scp173SpawnPoint;
 
 		// Configs
 		private int turnOffPlayers;
+		private float tutorialSpawnDelay;
 
 		public EventHandler(Plugin plugin)
 		{
@@ -40,11 +41,12 @@ namespace SmallRound
 			isDecon = false;
 			isEnabled = ev.Server.GetPlayers().Count < turnOffPlayers;
 
-			mtfSpawnPoint = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftB).GetPositions()[0];
-			chaosSpawnPoint = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftA).GetPositions()[0];
-
 			if (isEnabled)
 			{
+				mtfSpawnPoint = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftB).GetPositions()[0];
+				chaosSpawnPoint = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftA).GetPositions()[0];
+				scp173SpawnPoint = instance.Server.Map.GetRandomSpawnPoint(Role.SCP_173);
+
 				foreach (Smod2.API.Item item in ev.Server.Map.GetItems(ItemType.ZONE_MANAGER_KEYCARD, true))
 				{
 					Vector pos = item.GetPosition();
@@ -82,6 +84,16 @@ namespace SmallRound
 						$"the same place you escaped at. Decontamination will force end " +
 						$"the round."
 					);
+
+					Vector pos = GetProperSpawnPos(player);
+					if (player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
+					{
+						Timing.RunCoroutine(SpawnDelay(player, pos, tutorialSpawnDelay));
+					}
+					else
+					{
+						player.Teleport(pos);
+					}
 				}
 			}
 		}
@@ -98,14 +110,14 @@ namespace SmallRound
 		{
 			if (isEnabled)
 			{
-				if (ev.Player.TeamRole.Team == Smod2.API.Team.SCP ||
-					ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
+				Vector pos = GetProperSpawnPos(ev.Player);
+				if (ev.Player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
 				{
-					ev.SpawnPos = instance.Server.Map.GetRandomSpawnPoint(Role.SCP_173);
+					Timing.RunCoroutine(SpawnDelay(ev.Player, pos, tutorialSpawnDelay));
 				}
-				else if (ev.Player.TeamRole.Role == Role.FACILITY_GUARD)
+				else
 				{
-					ev.SpawnPos = mtfSpawnPoint;
+					ev.SpawnPos = pos;
 				}
 			}
 		}
@@ -132,30 +144,6 @@ namespace SmallRound
 				else if (ev.Player.TeamRole.Team == Smod2.API.Team.SCIENTIST)
 				{
 					CheckEscape(ev.Player, Smod2.API.Team.SCIENTIST);
-				}
-			}
-		}
-
-		public void OnTeamRespawn(TeamRespawnEvent ev)
-		{
-			if (isEnabled)
-			{
-				Vector pos = null;
-				if (ev.SpawnChaos)
-				{
-					pos = chaosSpawnPoint;
-				}
-				else
-				{
-					pos = mtfSpawnPoint;
-				}
-
-				if (pos != null)
-				{
-					foreach (Player player in ev.PlayerList)
-					{
-						Timing.RunCoroutine(SpawnDelay(player, pos, 0.2f));
-					}
 				}
 			}
 		}

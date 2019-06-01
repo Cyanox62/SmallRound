@@ -20,9 +20,10 @@ namespace SmallRound
 
 		public override void Register()
 		{
-			AddEventHandlers(new EventHandler(this), Smod2.Events.Priority.Low);
+			AddEventHandlers(new EventHandler(this));
 
 			AddConfig(new Smod2.Config.ConfigSetting("sr_turnoff_players", 8, true, "The amount of players that have to be in the server before this mode will turn off."));
+			AddConfig(new Smod2.Config.ConfigSetting("sr_tutorial_spawn_delay", 0.2f, true, "The delay for setting a tutorial to the proper position after spawning in."));
 		}
 	}
 }

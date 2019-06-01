@@ -13,6 +13,7 @@ namespace SmallRound
 		private void LoadConfigs()
 		{
 			turnOffPlayers = instance.GetConfigInt("sr_turnoff_players");
+			tutorialSpawnDelay = instance.GetConfigFloat("sr_tutorial_spawn_delay");
 		}
 
 		private void CheckEscape(Player player, Smod2.API.Team team)
@@ -30,7 +31,7 @@ namespace SmallRound
 		private IEnumerator<float> SpawnDelay(Player player, Vector pos, float delay)
 		{
 			yield return Timing.WaitForSeconds(delay);
-
+			instance.Info("running");
 			player.Teleport(pos);
 		}
 
@@ -50,6 +51,27 @@ namespace SmallRound
 				{
 					instance.Server.Map.SpawnItem(item, pos, Vector.Zero);
 				}
+			}
+		}
+
+		private Vector GetProperSpawnPos(Player player)
+		{
+			if (player.TeamRole.Team == Smod2.API.Team.CLASSD ||
+				player.TeamRole.Team == Smod2.API.Team.TUTORIAL)
+			{
+				return scp173SpawnPoint;
+			}
+			else if (player.TeamRole.Team == Smod2.API.Team.NINETAILFOX)
+			{
+				return mtfSpawnPoint;
+			}
+			else if (player.TeamRole.Team == Smod2.API.Team.CHAOS_INSURGENCY)
+			{
+				return chaosSpawnPoint;
+			}
+			else
+			{
+				return null;
 			}
 		}
 	}
