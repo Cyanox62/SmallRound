@@ -20,7 +20,7 @@ namespace SmallRound
 
 		public override void Register()
 		{
-			AddEventHandlers(new EventHandler(this));
+			AddEventHandlers(new EventHandler(this), Smod2.Events.Priority.Low);
 
 			AddConfig(new Smod2.Config.ConfigSetting("sr_turnoff_players", 8, true, "The amount of players that have to be in the server before this mode will turn off."));
 		}

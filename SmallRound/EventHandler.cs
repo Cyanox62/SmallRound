@@ -19,6 +19,9 @@ namespace SmallRound
 		private bool isEnabled = false;
 		private bool isDecon = false;
 
+		private Vector mtfSpawnPoint;
+		private Vector chaosSpawnPoint;
+
 		// Configs
 		private int turnOffPlayers;
 
@@ -37,9 +40,19 @@ namespace SmallRound
 			isDecon = false;
 			isEnabled = ev.Server.GetPlayers().Count < turnOffPlayers;
 
+			mtfSpawnPoint = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftB).GetPositions()[0];
+			chaosSpawnPoint = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftA).GetPositions()[0];
+
 			if (isEnabled)
 			{
 				foreach (Smod2.API.Item item in ev.Server.Map.GetItems(ItemType.ZONE_MANAGER_KEYCARD, true))
+				{
+					Vector pos = item.GetPosition();
+					item.Remove();
+					ev.Server.Map.SpawnItem(ItemType.SCIENTIST_KEYCARD, pos, Vector.Zero);
+				}
+
+				foreach (Smod2.API.Item item in ev.Server.Map.GetItems(ItemType.MAJOR_SCIENTIST_KEYCARD, true))
 				{
 					Vector pos = item.GetPosition();
 					item.Remove();
@@ -92,7 +105,7 @@ namespace SmallRound
 				}
 				else if (ev.Player.TeamRole.Role == Role.FACILITY_GUARD)
 				{
-					ev.SpawnPos = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftB).GetPositions()[0];
+					ev.SpawnPos = mtfSpawnPoint;
 				}
 			}
 		}
@@ -130,11 +143,11 @@ namespace SmallRound
 				Vector pos = null;
 				if (ev.SpawnChaos)
 				{
-					pos = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftA).GetPositions()[0];
+					pos = chaosSpawnPoint;
 				}
 				else
 				{
-					pos = instance.Server.Map.GetElevators().FirstOrDefault(x => x.ElevatorType == ElevatorType.LiftB).GetPositions()[0];
+					pos = mtfSpawnPoint;
 				}
 
 				if (pos != null)
